@@ -7,7 +7,7 @@ Item {
     StatusBar {
         id: statusbar
     }
-    Image {
+    Rectangle {
         Component.onCompleted: {
             Settings.getDatabase()
             Utils.handle_battery_monitor(statusbar.battery_container, statusbar.battery_level)
@@ -15,7 +15,7 @@ Item {
         id: lockscreen_image
         width: root.width
         height: root.height
-        source: Settings.get("wallpaper_path")
+        color: "black"
     }
     Rectangle {
         id: lockscreen_overlay

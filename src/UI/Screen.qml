@@ -30,11 +30,11 @@ Rectangle {
         visible: (state_handler.state === "locked")
     }
 
-    Image {
+    Rectangle {
         width: root.width
         height: root.height
         visible: (state_handler.state === "normal")
-        source: Settings.get("wallpaper_path")
+        color: "black"
         Component.onCompleted: {
             Utils.application_list_refresh(application_list)
         }
