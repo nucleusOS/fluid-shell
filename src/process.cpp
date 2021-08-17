@@ -14,9 +14,6 @@ void Process::start(const QString &program, const QVariantList &arguments) {
         args << arguments[i].toString();
 
     QProcess proc;
-    /*QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-    env.insert("QT_IM_MODULE"," ");
-    proc.setProcessEnvironment(env);*/
     proc.setProgram(program);
     proc.startDetached();
 
