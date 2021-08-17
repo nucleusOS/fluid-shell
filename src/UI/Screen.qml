@@ -153,19 +153,20 @@ Rectangle {
                 id: app_switcher_page
                 Text {
                     visible: (shellSurfaces.count === 0)
-                    text: "No open applications"
+                    text: "Nothing open yet"
                     anchors {
                         verticalCenter: parent.verticalCenter
                         horizontalCenter: parent.horizontalCenter
                     }
-                    color: "white"
-                    font.pointSize: parent.height / 25
+                    color: "#ffffff"
+                    opacity: 0.4
+                    font.pointSize: parent.height / 30
                 }
 
                 GridView {
                     id: app_switcher_grid
-                    x: margin_padding
-                    y: statusbar.height + margin_padding
+                    x:15 * margin_padding / 2
+                    y: statusbar.height + 10 * margin_padding
                     width: parent.width
                     height: parent.height - statusbar.height
                     cellWidth: parent.width / 2
@@ -175,24 +176,40 @@ Rectangle {
                         top: statusbar.bottom
                         topMargin: margin_padding
                     }
-                    delegate: ShellSurfaceItem {
-                        inputEventsEnabled: false
-                        shellSurface: modelData
-                        width: app_switcher_grid.cellWidth - 2 * margin_padding
-                        height: app_switcher_grid.cellHeight - margin_padding
-                        sizeFollowsSurface: false
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
+                    delegate: Item {
+                        width: app_switcher_grid.cellWidth - 15 * margin_padding
+                        height: app_switcher_grid.cellHeight - 10 * margin_padding
+                        Text {
+                            id: app_switcher_title
+                            color: "#ffffff"
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: app_switcher_surfaceItem.top
+                            anchors.bottomMargin: margin_padding
+                            text: (modelData.toplevel.title.toString().length > 16) ? modelData.toplevel.title.toString().substring(0,16) + "..." : modelData.toplevel.title
+                            font.pixelSize: root.height / 50
+                        }
 
-                                application_display.currentIndex = index
-                                application_container.y = statusbar.height
-                                application_container.visible = true
-                                screen_swipe_view.currentIndex = 1
+                        ShellSurfaceItem {
+                            id: app_switcher_surfaceItem
+                            inputEventsEnabled: false
+                            shellSurface: modelData
+                            width: parent.width
+                            height: parent.height - app_switcher_title.height
+                            anchors.bottom: parent.bottom
+                            sizeFollowsSurface: false
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+
+                                    application_display.currentIndex = index
+                                    application_container.y = statusbar.height
+                                    application_container.visible = true
+                                    screen_swipe_view.currentIndex = 1
+                                }
+                               onPressAndHold: {
+                                   modelData.surface.client.close()
+                               }
                             }
-                           onPressAndHold: {
-                               modelData.surface.client.close()
-                           }
                         }
                     }
                 }

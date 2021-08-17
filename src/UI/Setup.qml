@@ -5,7 +5,7 @@ import "../utils/settings.js" as Settings
 
 Rectangle {
     id: root
-    color: "#343232"
+    color: "black"
     width: wayland_window.width
     height: wayland_window.height
 
@@ -24,7 +24,7 @@ Rectangle {
     Button {
         text: "Start"
         background: Rectangle {
-            color: "#8f8bd8"
+            color: "grey"
             radius: 4
         }
         anchors {
