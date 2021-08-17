@@ -133,17 +133,15 @@ Rectangle {
                                         bottom: parent.bottom
                                         bottomMargin: margin_padding
                                         leftMargin: margin_padding
-                                        left: parent.left
+                                        horizontalCenter: parent.horizontalCenter
                                     }
                                 }
 
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        appPages.clean()
-                                        Utils.application_list_refresh(application_list)
-                                        //application_container.visible = true
-                                        //proc.start(appPages[0][index][2])
+                                        application_container.visible = true
+                                        proc.start(appPages[0][index][2])
                                     }
                                 }
                             }
