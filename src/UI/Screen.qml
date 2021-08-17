@@ -140,7 +140,10 @@ Rectangle {
                                 MouseArea {
                                     anchors.fill: parent
                                     onClicked: {
-                                        proc.start(appPages[0][index][2])
+                                        appPages.clean()
+                                        Utils.application_list_refresh(application_list)
+                                        //application_container.visible = true
+                                        //proc.start(appPages[0][index][2])
                                     }
                                 }
                             }
@@ -183,8 +186,10 @@ Rectangle {
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
+
                                 application_display.currentIndex = index
                                 application_container.y = statusbar.height
+                                application_container.visible = true
                                 screen_swipe_view.currentIndex = 1
                             }
                            onPressAndHold: {

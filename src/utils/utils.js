@@ -4,6 +4,7 @@ function application_list_refresh(item) {
     appPages[page] = []
     item.model = 0
     for (var i in apps) {
+        console.log(apps)
         var app = apps[i]
         appPages[page].push(app)
     }

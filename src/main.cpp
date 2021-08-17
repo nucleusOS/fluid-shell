@@ -10,6 +10,8 @@
 #include <QIcon>
 #include <QScreen>
 #include <QQuickWindow>
+#include <qdiriterator.h>
+#include <QSettings>
 #include "image_provider.h"
 #include "process.h"
 #include "battery_handler.h"
@@ -20,66 +22,67 @@ struct AppInfo {
     QString exec;
 };
 
+constexpr auto DESKTOP_FILE_SYSTEM_DIR = "/usr/share/applications";
+constexpr auto DESKTOP_FILE_USER_DIR = "%1/.local/share/applications";
+constexpr auto DESKTOP_ENTRY_STRING = "Desktop Entry";
 
-QVariantList apps() {
-    QVariantList apps;
-
-    QDir dir("/usr/share/applications");
-    foreach (auto fn, dir.entryList(QStringList() << "*.desktop", QDir::Files)) {
-       // qDebug() << "Reading" << dir.filePath(fn);
-        QFile file(dir.filePath(fn));
-        if (file.open(QIODevice::ReadOnly)) {
-            QTextStream in(&file);
-            AppInfo app;
-            bool foundDesktopEntry = false;
-            while (!in.atEnd()) {
-                QString line = in.readLine();
-                if (line.trimmed().isEmpty()){
-                    continue;
-                }
-                if (!foundDesktopEntry) {
-                    if (line.contains("[Desktop Entry]"))
-                        foundDesktopEntry = true;
-                    continue;
-                }
-                else if (line.startsWith('[') && line.endsWith(']')) {
-                    break;
-                }
-                QStringList values = line.split("=");
-                QString name = values.takeFirst();
-                QString value = QString(values.join('='));
-                if (name == "Name") {
-                    if (value.length() > 16){
-                         QString short_value = value.mid(0,16);
-                         short_value.append("...");
-                         app.name = short_value;
-                    } else {
-                        app.name = value;
-                    }
-                }
-                if (name == "Icon") {
-                    app.icon = value;
-                    QIcon icon = QIcon::fromTheme(app.icon);
-                }
-
-                if (name == "Exec") {
-                    app.exec = value.remove("\"").remove(QRegExp(" %."));
-                }
-            }
-            apps.append(QStringList() << app.name << app.icon << app.exec);
-        }
+class AppReader {
+public:
+    AppReader(QSettings &settings, const QString &groupName)
+            : m_settings(settings) {
+        m_settings.beginGroup(groupName);
     }
-    return apps;
-}
 
+    ~AppReader() {
+        m_settings.endGroup();
+    }
+
+private:
+    QSettings &m_settings;
+};
+
+QVariantList createAppsList(const QString &path) {
+    QDirIterator it(path, {"*.desktop"}, QDir::NoFilter, QDirIterator::Subdirectories);
+    QVariantList ret;
+
+    while (it.hasNext()) {
+        const auto filename = it.next();
+        QSettings desktopFile(filename, QSettings::IniFormat);
+
+        if (!desktopFile.childGroups().contains(DESKTOP_ENTRY_STRING))
+            continue;
+
+        AppReader reader(desktopFile, DESKTOP_ENTRY_STRING);
+
+        AppInfo app;
+        app.exec = desktopFile.value("Exec").toString().remove("\"").remove(QRegExp(" %."));
+        app.icon = desktopFile.value("Icon", "application").toString();
+
+        if (desktopFile.value("Name").toString().length() > 14){
+            QString short_value = desktopFile.value("Name").toString().mid(0,14);
+            short_value.append("...");
+            app.name = short_value;
+        } else {
+            app.name = desktopFile.value("Name").toString();
+        }
+        if(desktopFile.value("NoDisplay") != "true" && desktopFile.value("Hidden") != "true") {
+            ret.append(QStringList{app.name, app.icon, app.exec});
+        }
+
+    }
+
+    return ret;
+}
+QVariantList apps() {
+    QVariantList ret;
+    ret.append(createAppsList(DESKTOP_FILE_SYSTEM_DIR));
+    ret.append(createAppsList(QString(DESKTOP_FILE_USER_DIR).arg(QDir::homePath())));
+    return ret;
+}
 
 int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
     QGuiApplication app(argc, argv);
-
-
-
     QQmlApplicationEngine engine;
     const QUrl url(QStringLiteral("qrc:/main.qml"));
     engine.setOfflineStoragePath(QDir::homePath() + "/.fluid/");
