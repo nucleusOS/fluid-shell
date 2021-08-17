@@ -13,7 +13,6 @@ Rectangle {
     property var appPages: []
     property int margin_padding: root.height / (50 * Settings.get("applications_per_row"))
     property alias statusbar: statusbar
-    property alias bottombar: bottombar
     Component.onCompleted: {
         Settings.getDatabase()
         statusbar.battery_percentage.text = battery_handler.battery_level() + "%"
@@ -27,13 +26,14 @@ Rectangle {
         id: lockscreen
         width: root.width
         height: root.height
-        visible: (state_handler.state === "locked")
+        visible: true
+        z: 2000
     }
 
     Rectangle {
         width: root.width
         height: root.height
-        visible: (state_handler.state === "normal")
+        visible: true
         color: "black"
         Component.onCompleted: {
             Utils.application_list_refresh(application_list)
@@ -46,7 +46,7 @@ Rectangle {
             visible: (shellSurfaces.count > 0) ? true : false
             id: application_container
             width: parent.width
-            height: parent.height - statusbar.height - bottombar.height
+            height: parent.height - statusbar.height
             y: statusbar.height
             z: (application_container.visible == true) ? 200 : 0
             StackLayout {
@@ -59,7 +59,7 @@ Rectangle {
                         source: (modelData.toString().match(/XWaylandShellSurface/)) ? "../../Chromes/XWaylandChrome.qml" : "../../Chromes/WaylandChrome.qml"
                         Component.onCompleted: {
                             application_display.currentIndex = application_display.count - 1
-                            application_container.visible = true
+                            application_container.y = statusbar.height
                         }
                         Component.onDestruction: {
                             application_display.currentIndex--
@@ -95,7 +95,7 @@ Rectangle {
                     id: application_list
                     x: margin_padding
                     width: screen_swipe_view.width - margin_padding
-                    height: screen_swipe_view.height - statusbar.height - margin_padding - bottombar.height
+                    height: screen_swipe_view.height - statusbar.height - margin_padding
                     model: appPages[0].length
                     cellWidth: (screen_swipe_view.width - margin_padding) / Settings.get("applications_per_row")
                     cellHeight: (screen_swipe_view.width - margin_padding) / Settings.get("applications_per_row")
@@ -166,7 +166,7 @@ Rectangle {
                     x: margin_padding
                     y: statusbar.height + margin_padding
                     width: parent.width
-                    height: parent.height - statusbar.height - bottombar.height
+                    height: parent.height - statusbar.height
                     cellWidth: parent.width / 2
                     cellHeight: parent.height / 2
                     model: shellSurfaces
@@ -184,38 +184,52 @@ Rectangle {
                             anchors.fill: parent
                             onClicked: {
                                 application_display.currentIndex = index
-                                application_container.visible = true
+                                application_container.y = statusbar.height
+                                screen_swipe_view.currentIndex = 1
                             }
-                        }
-                        Rectangle {
-                            width: 25 * Settings.get("scaling_factor")
-                            radius: width*0.5
-                            height: 25 * Settings.get("scaling_factor")
-                            color: "gray"
-                            anchors { right: parent.right; top: parent.top}
-                            Text {
-                                anchors {
-                                    verticalCenter: parent.verticalCenter
-                                    horizontalCenter: parent.horizontalCenter
-                                }
-                                text: "x"
-                                font.pointSize: 10 * Settings.get("scaling_factor")
-                                color: "red"
-                            }
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    modelData.surface.client.close()
-                                }
-                            }
+                           onPressAndHold: {
+                               modelData.surface.client.close()
+                           }
                         }
                     }
                 }
             }
         }
+        Item {
+            width: parent.width
+            z: 1000
+            height: 15 * Settings.get("scaling_factor")
+            anchors.bottom: parent.bottom
+            MouseArea {
+                anchors.fill: parent
+                drag.target: application_container
+                drag.axis: Drag.YAxis
+                drag.maximumY: root.height
+                onReleased: {
+                    if(-application_container.y > root.height / 3) {
+                        slide.start()
+                    } else {
+                        bounce.start()
+                    }
+                }
+            }
+        }
 
-        BottomBar {
-            id: bottombar
+        NumberAnimation {
+            id: slide
+            target: application_container
+            properties: "y"
+            to: -root.height
+            easing.type: Easing.OutQuad
+            duration: 200
+        }
+        NumberAnimation {
+            id: bounce
+            target: application_container
+            properties: "y"
+            to: statusbar.height
+            easing.type: Easing.OutQuad
+            duration: 200
         }
         //battery handler timer
         //TODO better "battery path" handler

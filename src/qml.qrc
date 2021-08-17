@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>utils/settings.js</file>
-        <file>UI/BottomBar.qml</file>
         <file>UI/StatusBar.qml</file>
         <file>utils/utils.js</file>
         <file>UI/LockScreen.qml</file>

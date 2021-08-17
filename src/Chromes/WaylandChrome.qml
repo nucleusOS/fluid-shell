@@ -11,6 +11,5 @@ ShellSurfaceItem {
     onSurfaceDestroyed: shellSurfaces.remove(index)
     visible: true
     autoCreatePopupItems: true
-
 }
 

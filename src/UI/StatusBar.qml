@@ -12,7 +12,7 @@ Rectangle {
     }
     width: root.width
     height: (root.width > root.height) ? root.width / 30 * Settings.get("scaling_factor") : root.height / 30 * Settings.get("scaling_factor")
-    z: 50
+    z: 1000
     color: (state_handler.state === "locked") ? "#00000000" : "#000000"
     anchors {
         top: parent.top

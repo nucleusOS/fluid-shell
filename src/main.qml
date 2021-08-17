@@ -68,7 +68,7 @@ Item {
                 shellSurfaces.append({
                     shellSurface: xdgSurface
                 })
-                toplevel.sendResizing(Qt.size(wayland_window.width, wayland_window.height - root.statusbar.height - root.bottombar.height))
+                toplevel.sendResizing(Qt.size(wayland_window.width, wayland_window.height - root.statusbar.height ))
 
             }
         }
