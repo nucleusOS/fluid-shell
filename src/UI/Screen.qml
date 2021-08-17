@@ -86,7 +86,7 @@ Rectangle {
                         horizontalCenter: parent.horizontalCenter
                     }
                     color: "white"
-                    font.pixelSize: parent.height / 25
+                    font.pixelSize: parent.height / 25 * Settings.get("scaling_factor")
                 }
             }
             Item {
@@ -131,8 +131,6 @@ Rectangle {
                                     color: "#ffffff"
                                     anchors {
                                         bottom: parent.bottom
-                                        bottomMargin: margin_padding
-                                        leftMargin: margin_padding
                                         horizontalCenter: parent.horizontalCenter
                                     }
                                 }
@@ -160,7 +158,7 @@ Rectangle {
                     }
                     color: "#ffffff"
                     opacity: 0.4
-                    font.pixelSize: parent.height / 30
+                    font.pixelSize: parent.height / 30 * Settings.get("scaling_factor")
                 }
 
                 GridView {
@@ -186,15 +184,15 @@ Rectangle {
                             anchors.bottom: app_switcher_surfaceItem.top
                             anchors.bottomMargin: margin_padding
                             text: (modelData.toplevel.title.toString().length > 16) ? modelData.toplevel.title.toString().substring(0,16) + "..." : modelData.toplevel.title
-                            font.pixelSize: root.height / 50
+                            font.pixelSize: root.height / 50 * Settings.get("scaling_factor")
                         }
 
                         ShellSurfaceItem {
                             id: app_switcher_surfaceItem
                             inputEventsEnabled: false
                             shellSurface: modelData
-                            width: parent.width
-                            height: parent.height - app_switcher_title.height
+                            width: parent.width * Settings.get("scaling_factor")
+                            height: (parent.height - app_switcher_title.height) * Settings.get("scaling_factor")
                             anchors.bottom: parent.bottom
                             sizeFollowsSurface: false
                             MouseArea {
