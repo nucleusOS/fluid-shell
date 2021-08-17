@@ -86,7 +86,7 @@ Rectangle {
                         horizontalCenter: parent.horizontalCenter
                     }
                     color: "white"
-                    font.pointSize: parent.height / 25
+                    font.pixelSize: parent.height / 25
                 }
             }
             Item {
@@ -160,7 +160,7 @@ Rectangle {
                     }
                     color: "#ffffff"
                     opacity: 0.4
-                    font.pointSize: parent.height / 30
+                    font.pixelSize: parent.height / 30
                 }
 
                 GridView {

@@ -24,7 +24,7 @@ Item {
         id: lockscreen_time
         text: Qt.formatDateTime(new Date(), "HH:mm")
         color: 'white'
-        font.pointSize: (parent.height / 30) * Settings.get("scaling_factor")
+        font.pixelSize: (parent.height / 30) * Settings.get("scaling_factor")
         anchors {
             left: parent.left
             bottom: lockscreen_date.top
@@ -35,7 +35,7 @@ Item {
         id: lockscreen_date
         text: Qt.formatDateTime(new Date(), "dddd, MMMM d")
         color: 'white'
-        font.pointSize: (parent.height / 50) * Settings.get("scaling_factor")
+        font.pixelSize: (parent.height / 50) * Settings.get("scaling_factor")
         anchors {
             left: parent.left
             bottom: parent.bottom
